@@ -5,6 +5,7 @@ import (
 	"os"
 	_ "os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -14,8 +15,20 @@ var rootCmd = &cobra.Command{
 	Short: "simple demonstration of load balancer in GO",
 	Long:  " this is load  balancer in Go that demonstrates how to distribute incoming traffic across multiple backend servers to improve performance and reliability using multibel algorithims .",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Welcome to Load balancer please use --help for more information about available command ")
-		fmt.Println("Example : load-balancer --help")
+
+		cyan := color.New(color.FgCyan).SprintFunc()
+		green := color.New(color.FgGreen, color.Bold).SprintFunc()
+		// 2. Your new LB-ROCK ASCII Art
+		asciiArt := `
+    __    ____           ____  ____  ________ __
+   / /   / __ )         / __ \/ __ \/ ____/ //_/
+  / /   / __  |  ______/ /_/ / / / / /   / ,<   
+ / /___/ /_/ /  /_____/ _, _/ /_/ / /___/ /| |  
+/_____/_____/        /_/ |_|\____/\____/_/ |_|  
+`
+		fmt.Println(cyan(asciiArt))
+
+		fmt.Println(green("Welcome to my  Load balancer  (LB-ROCK)  please use --help for more information about available command "))
 
 	},
 	Version:      version,
