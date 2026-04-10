@@ -1,0 +1,19 @@
+servers : 
+- name : server1
+  url : http://localhost:8080
+  alive : true
+  max_request_per_server : 1000
+- name : server2
+  url : http://localhost:8081
+  alive : true
+  max_request_per_server : 1000
+- name : server3
+  url: http://localhost:8082
+  alive : true 
+  max_request_per_server : 1000
+
+
+
+proxy_server : 
+ port : 8000
+ endpoint : http://localhost/proxy 
