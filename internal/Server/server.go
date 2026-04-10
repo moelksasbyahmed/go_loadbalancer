@@ -1,15 +1,12 @@
 package server
 
-type backend struct {
-	name        string
-	url         string
-	maxLoad     int
-	currentLoad int
-	status      string
-	timeout     int
-}
+import (
+	"net/url"
+	"sync/atomic"
+)
 
-type loadBalancer struct {
-	servers       []backend
-	overallStatus string
+type Backend struct {
+	name  string
+	url   *url.URL
+	Alive atomic.Bool
 }
