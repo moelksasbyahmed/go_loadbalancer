@@ -1,4 +1,4 @@
-module github.com/moelkasabyahmed/go_loadbalancer
+module github.com/moelksasbyahmed/go_loadbalancer
 
 go 1.25.0
 
