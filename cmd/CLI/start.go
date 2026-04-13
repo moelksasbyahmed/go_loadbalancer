@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	server "github.com/moelkasabyahmed/go_loadbalancer/internal"
+	server "github.com/moelksasbyahmed/go_loadbalancer/internal"
 	"github.com/spf13/cobra"
 )
 

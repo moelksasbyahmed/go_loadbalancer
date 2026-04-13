@@ -14,6 +14,7 @@ servers :
 
 
 
-proxy_server : 
+LoadBalancerConfig : 
  port : 8000
  endpoint : http://localhost/proxy 
+ algorithim : Round_robin 

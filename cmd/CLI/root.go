@@ -18,7 +18,7 @@ var rootCmd = &cobra.Command{
 
 		cyan := color.New(color.FgCyan).SprintFunc()
 		green := color.New(color.FgGreen, color.Bold).SprintFunc()
-		// 2. Your new LB-ROCK ASCII Art
+
 		asciiArt := `
     __    ____           ____  ____  ________ __
    / /   / __ )         / __ \/ __ \/ ____/ //_/

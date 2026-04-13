@@ -3,19 +3,19 @@ package internal
 import (
 	"fmt"
 
-	_ "github.com/moelkasabyahmed/go_loadbalancer/internal/server"
 	"github.com/spf13/viper"
 )
 
 type Serversconfig struct {
-	Name        string `mapstructure:"name"`
-	URl         string `mapstructure:"url"`
-	Alive       bool   `mapstructure:"alive"`
-	max_request int    `mapstructure:"max_request_per_server"`
+	Name       string `mapstructure:"name"`
+	URl        string `mapstructure:"url"`
+	Alive      bool   `mapstructure:"alive"`
+	MaxRequest int    `mapstructure:"max_request_per_server"`
 }
 type ProxyConfig struct {
 	Proxy_port string `mapstructure:"port"`
 	Endpoint   string `mapstructure:"endpoint"`
+	Algorithim string `mapstructure:"algorithim"`
 }
 type Config struct {
 	Servers     []Serversconfig `mapstructure:"servers"`
