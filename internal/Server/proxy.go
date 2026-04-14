@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -8,30 +9,38 @@ import (
 	"time"
 )
 
-func StartLoadBalancer(endpoint string, port string, Algorithim BalancerAlgorithm) error {
-	LoadBalancer := NewloadBalancer(Algorithim)
-	proxyHandler := ProxyHandler(LoadBalancer)
+func (lb *LoadBalancer) Start() error {
+
+	proxyHandler := lb.ProxyHandler()
 
 	server := &http.Server{
-		Addr:         net.JoinHostPort(endpoint, port),
+		Addr:         net.JoinHostPort(lb.config.Host, lb.config.Port),
 		Handler:      proxyHandler,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
-	log.Printf("Starting load balancer on %s:%s\n", endpoint, port)
+	log.Printf("Starting load balancer on %s:%s\n", lb.config.Host, lb.config.Port)
 	err := server.ListenAndServe()
 	if err != nil {
-		return err
+		return fmt.Errorf("the problem is here: %v", err)
 
 	}
 
 	return nil
 }
-func ProxyHandler(lb *LoadBalancer) http.HandlerFunc {
+func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		Backend, err := lb.Algorithim.NextPeer(lb.ServerPool)
+		for _, servers := range lb.ServerPool {
+			log.Printf("Backend %s is alive: %t, current traffic: %d, max request: %d\n", servers.backend.url, servers.backend.Alive.Load(), servers.balance.current_traffic.Load(), servers.balance.Max_request)
+		}
+		if Backend == nil {
+			log.Printf("Backend is nil - no available servers")
+			http.Error(w, "No backends available", http.StatusServiceUnavailable)
+			return // ← IMPORTANT: return here!
+		}
 		if err != nil {
 			http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
 		}

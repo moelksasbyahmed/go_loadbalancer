@@ -22,14 +22,24 @@ type LoadBalancer struct {
 
 type LoadBalancerConfig struct {
 	Port       string
+	Host       string
 	Endpoint   string
 	Algorithim string
 }
+type AtomicBool struct {
+	*atomic.Bool
+}
+
+func NewAtomicBool(initial bool) *AtomicBool {
+	var ab AtomicBool
+	ab.Store(initial)
+	return &ab
+}
 
 type serverbalance struct {
-	overalltraffic         atomic.Int64
-	current_traffic        atomic.Int64
-	max_request_per_server int
+	overalltraffic  atomic.Int64
+	current_traffic atomic.Int64
+	Max_request     int
 }
 
 func NewloadBalancer(algorithm BalancerAlgorithm, config *LoadBalancerConfig) *LoadBalancer {
@@ -40,15 +50,11 @@ func NewloadBalancer(algorithm BalancerAlgorithm, config *LoadBalancerConfig) *L
 	}
 }
 
-func (lb *LoadBalancer) AddBackend(backend *Backend, s *serverbalance) error {
-
-	return nil
-}
 func (lb *LoadBalancer) Populate_LoadBalancer(conf *internal.Config) {
 
 	lb.mux.Lock()
 	defer lb.mux.Unlock()
-	for _, server := range conf.Servers {
+	for i, server := range conf.Servers {
 		lb.ServerPool = append(lb.ServerPool, &LoadBalancerUnit{
 			backend: &Backend{
 				name: server.Name,
@@ -62,11 +68,16 @@ func (lb *LoadBalancer) Populate_LoadBalancer(conf *internal.Config) {
 				Alive: atomic.Bool{},
 			},
 			balance: serverbalance{
-				overalltraffic:         atomic.Int64{},
-				current_traffic:        atomic.Int64{},
-				max_request_per_server: server.MaxRequest,
+				overalltraffic:  atomic.Int64{},
+				current_traffic: atomic.Int64{},
+				Max_request:     server.MaxRequest,
 			},
 		})
+		lb.ServerPool[i].backend.Alive.Store(server.Alive)
 	}
 
+}
+func (lb *LoadBalancer) AddBackend(backend *Backend, s *serverbalance) error {
+
+	return nil
 }
