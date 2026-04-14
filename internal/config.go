@@ -12,14 +12,15 @@ type Serversconfig struct {
 	Alive      bool   `mapstructure:"alive"`
 	MaxRequest int    `mapstructure:"max_request_per_server"`
 }
-type ProxyConfig struct {
-	Proxy_port string `mapstructure:"port"`
+type LoadBalancerConfig struct {
+	Host       string `mapstructure:"host"`
+	Port       string `mapstructure:"port"`
 	Endpoint   string `mapstructure:"endpoint"`
 	Algorithim string `mapstructure:"algorithim"`
 }
 type Config struct {
-	Servers     []Serversconfig `mapstructure:"servers"`
-	ProxyConfig ProxyConfig     `mapstructure:"proxy_server"`
+	Servers     []Serversconfig    `mapstructure:"servers"`
+	ProxyConfig LoadBalancerConfig `mapstructure:"LoadBalancerConfig"`
 }
 
 func LoadConfig(path string) (*Config, error) {
