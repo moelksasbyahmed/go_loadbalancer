@@ -7,17 +7,18 @@ import (
 )
 
 type Backend struct {
-	name  string
-	url   *url.URL
+	Name  string
+	Url   *url.URL
 	Alive atomic.Bool
 }
 
 type LoadBalancerUnit struct {
-	backend *Backend
-	balance serverbalance
+	Backend *Backend
+	Balance Serverbalance
 }
 type LoadBalancer struct {
 	ServerPool []*LoadBalancerUnit
+	Algorithim BalancerAlgorithm
 	mux        sync.RWMutex
 	config     *LoadBalancerConfig
 }
@@ -26,7 +27,7 @@ type LoadBalancerConfig struct {
 	Algorithim BalancerAlgorithm
 }
 
-type serverbalance struct {
+type Serverbalance struct {
 	overalltraffic  atomic.Int64
 	current_traffic atomic.Int64
 	Max_request     int
@@ -35,6 +36,7 @@ type serverbalance struct {
 func NewloadBalancer(config *LoadBalancerConfig) *LoadBalancer {
 	return &LoadBalancer{
 		ServerPool: make([]*LoadBalancerUnit, 0),
+		Algorithim: config.Algorithim,
 		config:     config,
 	}
 }

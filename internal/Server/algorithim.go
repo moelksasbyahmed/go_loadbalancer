@@ -50,13 +50,13 @@ func (rr *RoundRobin) NextPeer(backends []*LoadBalancerUnit) (*Backend, error) {
 	for i := 0; i < len(backends); i++ {
 		rr.current = (rr.current + 1) % len(backends)
 		candidate := backends[rr.current]
-		if !candidate.backend.Alive.Load() {
+		if !candidate.Backend.Alive.Load() {
 			continue
 		}
-		if candidate.balance.current_traffic.Load() >= int64(candidate.balance.Max_request) {
+		if candidate.Balance.current_traffic.Load() >= int64(candidate.Balance.Max_request) {
 			continue
 		}
-		return candidate.backend, nil
+		return candidate.Backend, nil
 	}
 	return nil, fmt.Errorf("no backends available")
 
