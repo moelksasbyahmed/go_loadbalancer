@@ -16,7 +16,9 @@ ServerConfig :
   host : localhost
   port : 8080
 
-
+adminConfig : 
+  host : localhost
+  port : 8086
 
 LoadBalancerConfig :  
   algorithim : Round_robin 
