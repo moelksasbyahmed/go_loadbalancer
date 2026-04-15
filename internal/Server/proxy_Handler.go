@@ -13,7 +13,7 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		Backend, err := lb.config.Algorithim.NextPeer(lb.ServerPool)
 		for _, servers := range lb.ServerPool {
-			log.Printf("Backend %s is alive: %t, current traffic: %d, max request: %d\n", servers.backend.url, servers.backend.Alive.Load(), servers.balance.current_traffic.Load(), servers.balance.Max_request)
+			log.Printf("Backend %s is alive: %t, current traffic: %d, max request: %d\n", servers.Backend.Url, servers.Backend.Alive.Load(), servers.Balance.current_traffic.Load(), servers.Balance.Max_request)
 		}
 		if Backend == nil {
 			log.Printf("Backend is nil - no available servers")
@@ -25,9 +25,9 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 		}
 		Director := func(req *http.Request) {
 
-			req.URL.Scheme = Backend.url.Scheme
-			req.URL.Host = Backend.url.Host
-			req.Host = Backend.url.Host
+			req.URL.Scheme = Backend.Url.Scheme
+			req.URL.Host = Backend.Url.Host
+			req.Host = Backend.Url.Host
 			req.Header.Set("X-Proxy-Timestamp", time.Now().UTC().Format(time.RFC3339))
 			clientIP := req.RemoteAddr
 			if forwardedFor := req.Header.Get("X-Forwarded-For"); forwardedFor != "" {
@@ -36,7 +36,7 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 			req.Header.Set("X-Forwarded-For", clientIP)
 			req.Header.Set("X-Forwarded-Host", req.Host)
 			req.Header.Set("X-Forwarded-Proto", req.URL.Scheme)
-			log.Printf("proxying %s  to %s  (Client_ip %s)\n ", req.URL.Path, Backend.url, clientIP)
+			log.Printf("proxying %s  to %s  (Client_ip %s)\n ", req.URL.Path, Backend.Url, clientIP)
 
 		}
 		Transport := &http.Transport{

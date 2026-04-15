@@ -11,14 +11,14 @@ import (
 
 type Server struct {
 	cfg        *internal.Config
-	lb         *LoadBalancer
+	LB         *LoadBalancer
 	HttpServer *http.Server
 }
 
 func NewServer(cfg *internal.Config, lb *LoadBalancer) *Server {
 	return &Server{
 		cfg: cfg,
-		lb:  lb,
+		LB:  lb,
 	}
 
 }
@@ -26,24 +26,28 @@ func NewServer(cfg *internal.Config, lb *LoadBalancer) *Server {
 func (s *Server) Start() error {
 	handlers := s.SetupRouter()
 	httpServer := &http.Server{
-		Addr:         net.JoinHostPort(s.cfg.ServerConfig.Host, s.cfg.ServerConfig.Port),
+		Addr:         net.JoinHostPort(s.cfg.LoadBalancerConfig.Host, s.cfg.LoadBalancerConfig.Port),
 		Handler:      handlers,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
 	s.HttpServer = httpServer
-	log.Printf("Server starts on %s ", s.cfg.ServerConfig.Host+s.cfg.ServerConfig.Port)
+	log.Printf("Server starts on http://%s:%s ", s.cfg.LoadBalancerConfig.Host, s.cfg.LoadBalancerConfig.Port)
 	return httpServer.ListenAndServe()
 }
 
 func (s *Server) SetupRouter() *http.ServeMux {
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", s.lb.ProxyHandler()) //TODO needs to be fixed which make a proxy Handler is extendable from the server struct and not from the load balancer struct
+	mux.HandleFunc("/", s.LB.ProxyHandler()) //TODO needs to be fixed which make a proxy Handler is extendable from the server struct and not from the load balancer struct
 	mux.HandleFunc("/health", s.HealthHandler)
 	mux.HandleFunc("/stats", s.StatsHandler)
 	mux.HandleFunc("/metrics", s.MetricsHandler)
 	return mux
 
+}
+
+func (s *Server) CloseServer() error {
+	return s.HttpServer.Close()
 }
