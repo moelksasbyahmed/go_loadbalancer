@@ -12,18 +12,20 @@ type Serversconfig struct {
 	Alive      bool   `mapstructure:"alive"`
 	MaxRequest int    `mapstructure:"max_request_per_server"`
 }
-type LoadBalancerConfig struct {
+type LoadBalancerconfig struct {
+	Port       string `mapstructure:"port"`
+	Host       string `mapstructure:"host"`
 	Algorithim string `mapstructure:"algorithim"`
 }
 
-type ServerConfig struct {
-	Host string `mapstructure:"host"`
-	Port string `mapstructure:"port"`
-}
 type Config struct {
 	Servers            []Serversconfig    `mapstructure:"servers"`
-	LoadBalancerConfig LoadBalancerConfig `mapstructure:"LoadBalancerConfig"`
-	ServerConfig       ServerConfig       `mapstructure:"ServerConfig"`
+	LoadBalancerConfig LoadBalancerconfig `mapstructure:"LoadBalancerConfig"`
+	Adminconfig        AdminConfig        `mapstructure:"adminConfig"`
+}
+type AdminConfig struct {
+	Port string `mapstructure:"port"`
+	Host string `mapstructure:"host"`
 }
 
 func LoadConfig(path string) (*Config, error) {

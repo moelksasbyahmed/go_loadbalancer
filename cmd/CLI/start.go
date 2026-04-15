@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	admin "github.com/moelksasbyahmed/go_loadbalancer/cmd/AdminApi"
+
 	config "github.com/moelksasbyahmed/go_loadbalancer/internal"
 	server "github.com/moelksasbyahmed/go_loadbalancer/internal/server"
 	"github.com/spf13/cobra"
@@ -34,17 +36,18 @@ var StartCmd = &cobra.Command{
 		Loadbalancer := server.NewloadBalancer(&server.LoadBalancerConfig{
 			Algorithim: Algo,
 		})
-		config.ServerConfig.Port, err = handle_port(config)
+		config.LoadBalancerConfig.Port, err = handle_port(config)
 		if err != nil {
 			return err
 		}
 		Loadbalancer.Populate_LoadBalancer(config)
 		LBserver = server.NewServer(config, Loadbalancer)
-		eror := LBserver.Start()
-		if eror != nil {
-			return err
+		go LBserver.Start()
+		adminapi := admin.NewAdminAPI(LBserver, config)
+		adminErr := adminapi.Start()
+		if adminErr != nil {
+			return adminErr
 		}
-
 		return nil
 
 	},
@@ -75,7 +78,7 @@ func handle_port(config *config.Config) (string, error) {
 		actualport = port
 
 	} else {
-		actualport = config.ServerConfig.Port
+		actualport = config.LoadBalancerConfig.Port
 
 	}
 	if !testport(actualport) {
