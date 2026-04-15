@@ -36,27 +36,26 @@ run-containers:
 	@echo ""
 	@docker ps --filter "name=server" --format "table {{.Names}}\t{{.Ports}}\t{{.Status}}"
 
-# Stop mock backend containers
 stop:
 	@echo "Stopping mock backend servers..."
 	@docker stop server1 server2 server3 2>nul 2>/dev/null || echo "Containers already stopped"
 	@echo "All containers stopped"
 
-# Remove containers completely
+
 clean-containers: stop
 	@echo "Removing containers..."
 	@-docker rm server1 server2 server3 2>nul 2>/dev/null || true
 	@echo " Containers removed"
 
-# Restart containers
+
 restart: clean-containers run-containers
 
-# Check status of containers
+
 status:
 	@echo "Container Status:"
 	@docker ps -a --filter "name=server" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" || echo "No containers found"
 
-# Test backend connectivity
+
 test:
 	@echo "Testing backend servers..."
 	@for i in 1 2 3; do \
@@ -64,7 +63,7 @@ test:
 		curl -s -o /dev/null -w "%{http_code}" http://localhost:800$$i/get && echo ""; \
 	done
 
-# Help menu
+
 help:
 	@echo "Available commands:"
 	@echo "  make build           - Build the Go application"
@@ -78,5 +77,5 @@ help:
 	@echo "  make test            - Test backend connectivity"
 	@echo "  make help            - Show this help message"
 
-# Default target
+
 .DEFAULT_GOAL := help

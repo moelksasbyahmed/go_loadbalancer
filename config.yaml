@@ -12,10 +12,11 @@ servers :
   alive : true 
   max_request_per_server : 1000
 
-
-
-LoadBalancerConfig : 
+ServerConfig : 
   host : localhost
-  port : 8000
-  endpoint : /proxy 
+  port : 8080
+
+
+
+LoadBalancerConfig :  
   algorithim : Round_robin 
