@@ -12,9 +12,7 @@ servers :
   alive : true 
   max_request_per_server : 1000
 
-ServerConfig : 
-  host : localhost
-  port : 8080
+
 
 adminConfig : 
   host : localhost
@@ -22,3 +20,5 @@ adminConfig :
 
 LoadBalancerConfig :  
   algorithim : Round_robin 
+  host : localhost
+  port : 8080
