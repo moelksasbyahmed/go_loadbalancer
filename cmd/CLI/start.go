@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"net"
 
-	server "github.com/moelksasbyahmed/go_loadbalancer/internal"
-	LB "github.com/moelksasbyahmed/go_loadbalancer/internal/server"
+	config "github.com/moelksasbyahmed/go_loadbalancer/internal"
+	server "github.com/moelksasbyahmed/go_loadbalancer/internal/server"
 	"github.com/spf13/cobra"
 )
 
+var LBserver *server.Server
 var port, configpath string
 var actualport string
 var StartCmd = &cobra.Command{
@@ -19,28 +20,31 @@ var StartCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		fmt.Println("Reading the confguration from Config.yaml file ... ", configpath)
-		config, err := server.LoadConfig(configpath)
+		config, err := config.LoadConfig(configpath)
 		if err != nil {
 			return err
 		}
 		fmt.Println("the configuration is read successfully ")
-		Algorithim, err := LB.GetAlgorithim(config.ProxyConfig.Algorithim)
-		fmt.Println("this is the Algorithim name ", config.ProxyConfig.Algorithim)
+		Algo, err := server.GetAlgorithim(config.LoadBalancerConfig.Algorithim)
+
 		if err != nil {
 			return err
 		}
 
-		Loadbalancer := LB.NewloadBalancer(Algorithim, &LB.LoadBalancerConfig{
-			Host:       config.ProxyConfig.Host,
-			Port:       config.ProxyConfig.Port,
-			Endpoint:   config.ProxyConfig.Endpoint,
-			Algorithim: config.ProxyConfig.Algorithim,
+		Loadbalancer := server.NewloadBalancer(&server.LoadBalancerConfig{
+			Algorithim: Algo,
 		})
-		Loadbalancer.Populate_LoadBalancer(config)
-		err = Loadbalancer.Start()
+		config.ServerConfig.Port, err = handle_port(config)
 		if err != nil {
 			return err
 		}
+		Loadbalancer.Populate_LoadBalancer(config)
+		LBserver = server.NewServer(config, Loadbalancer)
+		eror := LBserver.Start()
+		if eror != nil {
+			return err
+		}
+
 		return nil
 
 	},
@@ -65,13 +69,13 @@ func init() {
 
 }
 
-func handle_port(config *server.Config) (string, error) {
+func handle_port(config *config.Config) (string, error) {
 
 	if port != "" {
 		actualport = port
 
 	} else {
-		actualport = config.ProxyConfig.Port
+		actualport = config.ServerConfig.Port
 
 	}
 	if !testport(actualport) {

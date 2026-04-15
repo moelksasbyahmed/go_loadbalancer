@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +20,14 @@ This command will also:
   
 By default, the report is printed to the console. You can use flags to save it to a file.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("Aborting the load balancer ... ")
+		color.Red("Aborting the load balancer ... ")
+		if LBserver == nil {
+			return fmt.Errorf("the load balancer is not running ")
+		}
+		err := LBserver.HttpServer.Close()
+		if err != nil {
+			return fmt.Errorf("error aborting the load balancer: %v", err)
+		}
 		return nil
 	},
 }
