@@ -1,13 +1,16 @@
 package server
 
 import (
-	"fmt"
 	"net/url"
 	"sync"
 	"sync/atomic"
-
-	internal "github.com/moelksasbyahmed/go_loadbalancer/internal"
 )
+
+type Backend struct {
+	name  string
+	url   *url.URL
+	Alive atomic.Bool
+}
 
 type LoadBalancerUnit struct {
 	backend *Backend
@@ -15,25 +18,12 @@ type LoadBalancerUnit struct {
 }
 type LoadBalancer struct {
 	ServerPool []*LoadBalancerUnit
-	Algorithim BalancerAlgorithm
 	mux        sync.RWMutex
 	config     *LoadBalancerConfig
 }
 
 type LoadBalancerConfig struct {
-	Port       string
-	Host       string
-	Endpoint   string
-	Algorithim string
-}
-type AtomicBool struct {
-	*atomic.Bool
-}
-
-func NewAtomicBool(initial bool) *AtomicBool {
-	var ab AtomicBool
-	ab.Store(initial)
-	return &ab
+	Algorithim BalancerAlgorithm
 }
 
 type serverbalance struct {
@@ -42,42 +32,9 @@ type serverbalance struct {
 	Max_request     int
 }
 
-func NewloadBalancer(algorithm BalancerAlgorithm, config *LoadBalancerConfig) *LoadBalancer {
+func NewloadBalancer(config *LoadBalancerConfig) *LoadBalancer {
 	return &LoadBalancer{
 		ServerPool: make([]*LoadBalancerUnit, 0),
-		Algorithim: algorithm,
 		config:     config,
 	}
-}
-
-func (lb *LoadBalancer) Populate_LoadBalancer(conf *internal.Config) {
-
-	lb.mux.Lock()
-	defer lb.mux.Unlock()
-	for i, server := range conf.Servers {
-		lb.ServerPool = append(lb.ServerPool, &LoadBalancerUnit{
-			backend: &Backend{
-				name: server.Name,
-				url: func() *url.URL {
-					parsedUrl, err := url.Parse(server.URl)
-					if err != nil {
-						fmt.Printf("Error parsing Url %s /n ", server.URl)
-					}
-					return parsedUrl
-				}(),
-				Alive: atomic.Bool{},
-			},
-			balance: serverbalance{
-				overalltraffic:  atomic.Int64{},
-				current_traffic: atomic.Int64{},
-				Max_request:     server.MaxRequest,
-			},
-		})
-		lb.ServerPool[i].backend.Alive.Store(server.Alive)
-	}
-
-}
-func (lb *LoadBalancer) AddBackend(backend *Backend, s *serverbalance) error {
-
-	return nil
 }
