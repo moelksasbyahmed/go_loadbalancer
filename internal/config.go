@@ -13,14 +13,17 @@ type Serversconfig struct {
 	MaxRequest int    `mapstructure:"max_request_per_server"`
 }
 type LoadBalancerConfig struct {
-	Host       string `mapstructure:"host"`
-	Port       string `mapstructure:"port"`
-	Endpoint   string `mapstructure:"endpoint"`
 	Algorithim string `mapstructure:"algorithim"`
 }
+
+type ServerConfig struct {
+	Host string `mapstructure:"host"`
+	Port string `mapstructure:"port"`
+}
 type Config struct {
-	Servers     []Serversconfig    `mapstructure:"servers"`
-	ProxyConfig LoadBalancerConfig `mapstructure:"LoadBalancerConfig"`
+	Servers            []Serversconfig    `mapstructure:"servers"`
+	LoadBalancerConfig LoadBalancerConfig `mapstructure:"LoadBalancerConfig"`
+	ServerConfig       ServerConfig       `mapstructure:"ServerConfig"`
 }
 
 func LoadConfig(path string) (*Config, error) {
