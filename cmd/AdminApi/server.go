@@ -31,6 +31,7 @@ func (api *AdminAPi) Start() error {
 	mux.HandleFunc("/remove", api.handleRemoveServer)
 	mux.HandleFunc("/status", api.StatusHandler)
 	mux.HandleFunc("/list", api.ListHandler)
+	mux.HandleFunc("/abort", api.AbortHandler)
 	api.server = &http.Server{
 		Addr:         net.JoinHostPort(api.config.Adminconfig.Host, api.config.Adminconfig.Port),
 		Handler:      mux,

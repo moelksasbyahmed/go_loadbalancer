@@ -52,16 +52,15 @@ func (lb *LoadBalancer) AddBackend(server *LoadBalancerUnit) error {
 	return nil
 }
 
-func (lb *LoadBalancer) RemoveBackend(server *LoadBalancerUnit) error {
+func (lb *LoadBalancer) RemoveBackend(server *Backend) error {
 	lb.mux.Lock()
 	defer lb.mux.Unlock()
 	for i, Delserver := range lb.ServerPool {
-		if server.Backend.Name == Delserver.Backend.Name {
+		if server.Name == Delserver.Backend.Name || server.Url.String() == Delserver.Backend.Url.String() {
 			lb.ServerPool = slices.Delete(lb.ServerPool, i, i+1)
 			return nil
 		}
 
 	}
-	return fmt.Errorf("The Server  %s you want to Delete doesnt Exist ", server.Backend.Name)
-
+	return fmt.Errorf("The Server  %s you want to Delete doesnt Exist ", server.Name)
 }

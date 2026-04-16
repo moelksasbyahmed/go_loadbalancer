@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -20,14 +21,17 @@ This command will also:
   
 By default, the report is printed to the console. You can use flags to save it to a file.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		color.Red("Aborting the load balancer ... ")
-		if LBserver == nil {
-			return fmt.Errorf("the load balancer is not running ")
-		}
-		err := LBserver.HttpServer.Close()
+		Abort_url := Admin_Url + "/abort"
+		fmt.Println(Abort_url)
+		resp, err := http.Post(Abort_url, "", nil)
 		if err != nil {
-			return fmt.Errorf("error aborting the load balancer: %v", err)
+			return fmt.Errorf("failed to send abort request: %v", err)
 		}
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("abort request failed with status: %s", resp.Status)
+		}
+		defer resp.Body.Close()
+		color.Green("Load balancer aborted successfully. Final status and report have been updated in the database.")
 		return nil
 	},
 }
