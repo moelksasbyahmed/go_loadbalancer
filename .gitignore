@@ -1,1 +1,5 @@
 *.exe
+cmd/AdminApi/admindashboard/node_modules/
+cmd/AdminApi/admindashboard/dist/
+cmd/AdminApi/admindashboard/build/
+cmd/AdminApi/admindashboard 

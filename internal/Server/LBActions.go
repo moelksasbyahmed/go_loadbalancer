@@ -44,6 +44,7 @@ func (lb *LoadBalancer) AddBackend(server *LoadBalancerUnit) error {
 		if s.Backend.Name == server.Backend.Name {
 			return fmt.Errorf("backend with name %s already exists", server.Backend.Name)
 		}
+		server.Backend.Alive.Store(true)
 
 	}
 	lb.ServerPool = append(lb.ServerPool, server)
