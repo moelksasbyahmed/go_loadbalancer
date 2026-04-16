@@ -44,10 +44,12 @@ var StartCmd = &cobra.Command{
 		LBserver = server.NewServer(config, Loadbalancer)
 		go LBserver.Start()
 		adminapi := admin.NewAdminAPI(LBserver, config)
+
 		adminErr := adminapi.Start()
 		if adminErr != nil {
 			return adminErr
 		}
+
 		return nil
 
 	},

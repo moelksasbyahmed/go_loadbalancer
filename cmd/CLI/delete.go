@@ -22,7 +22,7 @@ var DeleteCommand = &cobra.Command{
 func init() {
 
 	DeleteCommand.Flags().StringVarP(&name, "name", "n", "", "deleting name of the backend server for clarity when status or check command occur ")
-	DeleteCommand.Flags().StringVarP(&backendIP, "backend-ip", "i", "", "deleting ip address of the backend server for clarity when status or check command occur ")
+	DeleteCommand.Flags().StringVarP(&backend_url, "backend-url", "u", "", "deleting url of the backend server for clarity when status or check command occur ")
 	rootCmd.AddCommand(DeleteCommand)
 
 }
