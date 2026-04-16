@@ -30,11 +30,16 @@ type AdminConfig struct {
 
 func LoadConfig(path string) (*Config, error) {
 	viper.SetConfigName("config")
-	fmt.Println("the path is ", path)
-	viper.SetConfigFile(path)
+
 	viper.SetConfigType("yaml")
+	if path != "" {
+		fmt.Println("the path is ", path)
+		viper.SetConfigFile(path)
+	}
+
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("./internal")
+	viper.AddConfigPath("../../")
 	viper.AddConfigPath("..")
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err

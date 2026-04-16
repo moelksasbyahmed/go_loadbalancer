@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +17,36 @@ var DeleteCommand = &cobra.Command{
 	Long: `delete a backend server from the load balancer and remove the backend server from the database and also update
 	 the status of the load balancer and the backend servers in the database `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("Deleting the backend server ... ")
+		if name == "" && backend_url == "" {
+			return fmt.Errorf("you must provide either the name of the backend server or the url of the backend server to delete it from the load balancer and the database ")
+		}
+		Del_url := Admin_Url + "/remove"
+		payload := &Backend{
+			Name: name,
+			Url:  backend_url,
+		}
+		body_bytes := new(bytes.Buffer)
+		err := json.NewEncoder(body_bytes).Encode(&payload)
+		if err != nil {
+			return fmt.Errorf("failed to encode payload: %v", err)
+		}
+		resp, err := http.NewRequest(http.MethodDelete, Del_url, body_bytes)
+		if err != nil {
+			return fmt.Errorf("failed to create request: %v", err)
+		}
+		client := &http.Client{}
+		response, err := client.Do(resp)
+		if err != nil {
+			return err
+		}
+		defer response.Body.Close()
+		if err != nil {
+			return fmt.Errorf("failed to send request: %v", err)
+		}
+		if response.StatusCode != http.StatusOK {
+			return fmt.Errorf("server error (%d): %s couldnt delete the backend server ", response.StatusCode, response.Status)
+		}
+		fmt.Println(color.GreenString("successfully removed backend %s ", name))
 		return nil
 
 	},
