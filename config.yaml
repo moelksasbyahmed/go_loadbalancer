@@ -1,10 +1,10 @@
 servers : 
 - name : server1
-  url : https://www.youtube.com/
+  url : http://localhost:8082
   alive : true
   max_request_per_server : 1000
 - name : server2
-  url : https://www.google.com/
+  url : http://localhost:8081
   alive : true
   max_request_per_server : 1000
 - name : server3
