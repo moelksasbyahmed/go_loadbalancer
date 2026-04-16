@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"sync"
 
+	"github.com/fatih/color"
 	admin "github.com/moelksasbyahmed/go_loadbalancer/cmd/AdminApi"
 
 	config "github.com/moelksasbyahmed/go_loadbalancer/internal"
@@ -15,12 +17,13 @@ import (
 var LBserver *server.Server
 var port, configpath string
 var actualport string
+var wg sync.WaitGroup
 var StartCmd = &cobra.Command{
 	Use:   "start",
 	Short: "start the load balancer and listen for incoming traffic on a specified port or read from config.yaml file",
 	Long:  "start the load balancer and listen for incoming traffic on a specified port or read from config.yaml file and distribute the traffic to the backend servers using multibel algorithims ",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
+		wg.Add(2)
 		fmt.Println("Reading the confguration from Config.yaml file ... ", configpath)
 		config, err := config.LoadConfig(configpath)
 		if err != nil {
@@ -40,15 +43,26 @@ var StartCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		if !testport(config.Adminconfig.Port) {
+			return errors.New("the admin port is not available you can kill the connection or try another port the retry the connection you entered  " + config.Adminconfig.Port)
+		}
 		Loadbalancer.Populate_LoadBalancer(config)
 		LBserver = server.NewServer(config, Loadbalancer)
-		go LBserver.Start()
-		adminapi := admin.NewAdminAPI(LBserver, config)
+		go func() {
+			defer wg.Done()
+			LBserver.Start()
 
-		adminErr := adminapi.Start()
-		if adminErr != nil {
-			return adminErr
-		}
+		}()
+
+		adminapi := admin.NewAdminAPI(LBserver, config)
+		go func() {
+			defer wg.Done()
+			adminapi.Start()
+
+		}()
+		wg.Wait()
+
+		fmt.Println(color.GreenString("Both servers have safely finished and returned. Exiting program."))
 
 		return nil
 
