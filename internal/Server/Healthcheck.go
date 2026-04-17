@@ -44,7 +44,7 @@ func (lb *LoadBalancer) GetBackendStatus() map[string]bool {
 	return status
 }
 
-func (lb *LoadBalancer) StartHealthCheckLoop(context context.Context, interval time.Duration) {
+func (lb *LoadBalancer) StartHealthCheckLoop(context context.Context, ctx context.Context, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	go func() {
 		defer ticker.Stop()
@@ -58,6 +58,10 @@ func (lb *LoadBalancer) StartHealthCheckLoop(context context.Context, interval t
 				}
 			case <-context.Done():
 				fmt.Println(color.GreenString("Health check loop stopped."))
+				return
+
+			case <-ctx.Done():
+				fmt.Println(color.GreenString("Health check loop stopped. via CTRL+C"))
 				return
 			}
 		}

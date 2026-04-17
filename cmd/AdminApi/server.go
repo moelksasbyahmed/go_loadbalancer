@@ -1,11 +1,13 @@
 package adminapi
 
 import (
+	"context"
 	"log"
 	"net"
 	"net/http"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/moelksasbyahmed/go_loadbalancer/internal"
 	LB "github.com/moelksasbyahmed/go_loadbalancer/internal/server"
 )
@@ -42,4 +44,18 @@ func (api *AdminAPi) Start() error {
 	log.Printf("Starting Admin Server on http://%s:%s ", api.config.Adminconfig.Host, api.config.Adminconfig.Port)
 	return api.server.ListenAndServe()
 
+}
+
+func (api *AdminAPi) Shutdown(ctx context.Context) error {
+	log.Println(color.YellowString("Shutting down the Load Balancer..."))
+	if err := api.LBServer.HttpServer.Shutdown(ctx); err != nil {
+		log.Printf("LB Server shutdown error: %v\n", err)
+	}
+
+	log.Println(color.YellowString("Shutting down the Admin API..."))
+	if err := api.server.Shutdown(ctx); err != nil {
+		log.Printf("Admin API shutdown error: %v\n", err)
+	}
+
+	return nil
 }

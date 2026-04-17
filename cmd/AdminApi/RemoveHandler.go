@@ -2,7 +2,6 @@ package adminapi
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"net/http"
 	"net/url"
@@ -22,7 +21,7 @@ func (api *AdminAPi) handleRemoveServer(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
 	}
 	RMV_URL, _ := url.Parse(back.Url)
-	fmt.Println(back.Name)
+
 	err = api.LBServer.LB.RemoveBackend(&server.Backend{
 		Name: back.Name,
 		Url:  RMV_URL,
@@ -31,6 +30,7 @@ func (api *AdminAPi) handleRemoveServer(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Server Doesnt Exist", http.StatusNotFound)
 		return
 	}
+	api.LBServer.LB.ViperSync()
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Server removed successfully"))
 }
