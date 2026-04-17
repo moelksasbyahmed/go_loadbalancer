@@ -9,7 +9,6 @@ import (
 	"sync/atomic"
 
 	internal "github.com/moelksasbyahmed/go_loadbalancer/internal"
-	"github.com/spf13/viper"
 )
 
 func (lb *LoadBalancer) Populate_LoadBalancer(conf *internal.Config) {
@@ -75,7 +74,17 @@ func (lb *LoadBalancer) HealthStatus() map[*Backend]bool {
 	return state
 
 }
+func (lb *LoadBalancer) TrafficStatus() map[*Backend]map[string]int64 {
+	states := make(map[*Backend]map[string]int64)
+	for _, server := range lb.ServerPool {
+		states[server.Backend] = map[string]int64{
+			"current_traffic": server.Balance.current_traffic.Load(),
+			"overall_traffic": server.Balance.overalltraffic.Load(),
+		}
+	}
+	return states
 
+}
 func (lb *LoadBalancer) ViperSync() {
 	var currentServers []internal.Serversconfig
 
@@ -88,6 +97,6 @@ func (lb *LoadBalancer) ViperSync() {
 		})
 
 	}
-	viper.Set("servers", currentServers)
+	lb.WritingConfig.Set("servers", currentServers)
 
 }

@@ -9,7 +9,17 @@ import (
 )
 
 func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
+	BaseTransport := &http.Transport{
 
+		MaxIdleConns:        100,
+		MaxIdleConnsPerHost: 40,
+		MaxConnsPerHost:     25,
+
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 60 * time.Second,
+		}).DialContext,
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		Backend, err := lb.config.Algorithim.NextPeer(lb.ServerPool)
 		for _, servers := range lb.ServerPool {
@@ -40,21 +50,10 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 			//log.Printf("proxying %s  to %s  (Client_ip %s)\n ", req.URL.Path, Backend.Url, clientIP)
 
 		}
-		Transport := &http.Transport{
-
-			MaxIdleConns:        100,
-			MaxIdleConnsPerHost: 40,
-			MaxConnsPerHost:     25,
-
-			DialContext: (&net.Dialer{
-				Timeout:   30 * time.Second,
-				KeepAlive: 60 * time.Second,
-			}).DialContext,
-		}
 
 		proxy := &httputil.ReverseProxy{
 			Director:  Director,
-			Transport: Transport,
+			Transport: BaseTransport,
 			ErrorHandler: func(rw http.ResponseWriter, req *http.Request, err error) {
 				log.Printf("Proxy error: %v", err)
 				http.Error(rw, "Bad Gateway", http.StatusBadGateway)

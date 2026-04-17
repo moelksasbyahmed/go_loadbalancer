@@ -4,6 +4,8 @@ import (
 	"net/url"
 	"sync"
 	"sync/atomic"
+
+	"github.com/spf13/viper"
 )
 
 type Backend struct {
@@ -18,10 +20,11 @@ type LoadBalancerUnit struct {
 	Balance Serverbalance
 }
 type LoadBalancer struct {
-	ServerPool []*LoadBalancerUnit
-	Algorithim BalancerAlgorithm
-	mux        sync.RWMutex
-	config     *LoadBalancerConfig
+	ServerPool    []*LoadBalancerUnit
+	Algorithim    BalancerAlgorithm
+	mux           sync.RWMutex
+	config        *LoadBalancerConfig
+	WritingConfig *viper.Viper
 }
 
 type LoadBalancerConfig struct {
@@ -34,10 +37,11 @@ type Serverbalance struct {
 	Max_request     int
 }
 
-func NewloadBalancer(config *LoadBalancerConfig) *LoadBalancer {
+func NewloadBalancer(config *LoadBalancerConfig, writer *viper.Viper) *LoadBalancer {
 	return &LoadBalancer{
-		ServerPool: make([]*LoadBalancerUnit, 0),
-		Algorithim: config.Algorithim,
-		config:     config,
+		ServerPool:    make([]*LoadBalancerUnit, 0),
+		Algorithim:    config.Algorithim,
+		config:        config,
+		WritingConfig: writer,
 	}
 }
