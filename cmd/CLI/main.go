@@ -10,7 +10,7 @@ import (
 var Admin_Url string
 
 func main() {
-	Adminconfig, _ := internal.LoadConfig("")
+	Adminconfig, _, _ := internal.LoadConfig("")
 	if Adminconfig == nil {
 		fmt.Println("Failed to load configuration, using default admin URL")
 		return

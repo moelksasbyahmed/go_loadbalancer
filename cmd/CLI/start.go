@@ -4,8 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
+	"time"
 
 	"github.com/fatih/color"
 	admin "github.com/moelksasbyahmed/go_loadbalancer/cmd/AdminApi"
@@ -13,6 +18,7 @@ import (
 	config "github.com/moelksasbyahmed/go_loadbalancer/internal"
 	server "github.com/moelksasbyahmed/go_loadbalancer/internal/server"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var LBserver *server.Server
@@ -26,7 +32,7 @@ var StartCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		wg.Add(2)
 		fmt.Println("Reading the confguration from Config.yaml file ... ", configpath)
-		config, err := config.LoadConfig(configpath)
+		config, writerconfig, err := config.LoadConfig(configpath)
 		if err != nil {
 			return err
 		}
@@ -39,7 +45,7 @@ var StartCmd = &cobra.Command{
 
 		Loadbalancer := server.NewloadBalancer(&server.LoadBalancerConfig{
 			Algorithim: Algo,
-		})
+		}, writerconfig)
 		config.LoadBalancerConfig.Port, err = handle_port(config)
 		if err != nil {
 			return err
@@ -50,7 +56,10 @@ var StartCmd = &cobra.Command{
 		Loadbalancer.Populate_LoadBalancer(config)
 		HealthCtx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		Loadbalancer.StartHealthCheckLoop(HealthCtx, config.LoadBalancerConfig.HealthCheckInterval)
+
+		ctx, sigCancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+		defer sigCancel()
+		Loadbalancer.StartHealthCheckLoop(HealthCtx, ctx, config.LoadBalancerConfig.HealthCheckInterval)
 		LBserver = server.NewServer(config, Loadbalancer)
 		go func() {
 			defer wg.Done()
@@ -64,8 +73,19 @@ var StartCmd = &cobra.Command{
 			adminapi.Start()
 
 		}()
-		wg.Wait()
+		go func() {
+			<-ctx.Done()
+			log.Println(color.RedString("\n[System] Ctrl+C received. Initiating shutdown..."))
+			shutdown, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer shutdownCancel()
+			adminapi.Shutdown(shutdown)
 
+		}()
+		wg.Wait()
+		vipererr := WriteViper(*writerconfig)
+		if vipererr != nil {
+			return vipererr
+		}
 		fmt.Println(color.GreenString("Both servers have safely finished and returned. Exiting program."))
 
 		return nil
@@ -105,4 +125,12 @@ func handle_port(config *config.Config) (string, error) {
 		return actualport, errors.New("the port is not available you can kill the connection or try another port the retry the connection you entered  " + actualport)
 	}
 	return actualport, nil
+}
+
+func WriteViper(writer viper.Viper) error {
+	if err := writer.WriteConfig(); err != nil {
+		return err
+	}
+	fmt.Println(color.GreenString("Successfully synced ServerPool to server.yaml"))
+	return nil
 }

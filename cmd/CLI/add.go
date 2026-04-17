@@ -22,7 +22,7 @@ var AddCommand = &cobra.Command{
 	     also update the status of the load balancer and the backend servers in the database `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var Add_Url = Admin_Url + "/add"
-		fmt.Println("this is the added URl ", Add_Url)
+
 		data := &Backend{
 			Name:        name,
 			Url:         backend_url,

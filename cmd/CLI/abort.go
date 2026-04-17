@@ -22,7 +22,7 @@ This command will also:
 By default, the report is printed to the console. You can use flags to save it to a file.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		Abort_url := Admin_Url + "/abort"
-		fmt.Println(Abort_url)
+
 		resp, err := http.Post(Abort_url, "", nil)
 		if err != nil {
 			return fmt.Errorf("failed to send abort request: %v", err)
