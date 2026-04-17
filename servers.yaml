@@ -1,0 +1,17 @@
+servers:
+    - alive: true
+      maxrequest: 0
+      name: server1
+      url: https://www.google.com/
+    - alive: true
+      maxrequest: 0
+      name: server2
+      url: https://www.youtube.com/
+    - alive: true
+      maxrequest: 0
+      name: server3
+      url: http://localhost:8083
+    - alive: true
+      maxrequest: 500
+      name: server4
+      url: http://localhost:5421

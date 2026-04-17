@@ -30,27 +30,43 @@ type AdminConfig struct {
 	Host string `mapstructure:"host"`
 }
 
-func LoadConfig(path string) (*Config, error) {
-	viper.SetConfigName("config")
+func LoadConfig(path string) (*Config, *viper.Viper, error) {
+	mainconfig := viper.New()
+	mainconfig.SetConfigName("config")
 
-	viper.SetConfigType("yaml")
+	mainconfig.SetConfigType("yaml")
 	if path != "" {
 		fmt.Println("the path is ", path)
-		viper.SetConfigFile(path)
+		mainconfig.SetConfigFile(path)
 	}
 
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("./internal")
-	viper.AddConfigPath("../../")
-	viper.AddConfigPath("..")
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
+	mainconfig.AddConfigPath(".")
+	mainconfig.AddConfigPath("./internal")
+	mainconfig.AddConfigPath("../../")
+	mainconfig.AddConfigPath("..")
+	if err := mainconfig.ReadInConfig(); err != nil {
+		return nil, nil, err
 	}
 	var fileconfig Config
-	if err := viper.Unmarshal(&fileconfig); err != nil {
-		return nil, err
+	if err := mainconfig.Unmarshal(&fileconfig); err != nil {
+		return nil, nil, err
 
 	}
-	return &fileconfig, nil
+	Serversconfig := viper.New()
+	Serversconfig.SetConfigName("servers")
+	Serversconfig.SetConfigType("yaml")
+	Serversconfig.AddConfigPath(".")
+	Serversconfig.AddConfigPath("./internal")
+	Serversconfig.AddConfigPath("../../")
+	Serversconfig.AddConfigPath("..")
+	if err := Serversconfig.ReadInConfig(); err != nil {
+		return nil, nil, err
+
+	}
+	if err := Serversconfig.UnmarshalKey("servers", &fileconfig.Servers); err != nil {
+		return nil, nil, err
+	}
+
+	return &fileconfig, Serversconfig, nil
 
 }
