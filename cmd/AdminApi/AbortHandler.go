@@ -16,9 +16,9 @@ func (api *AdminAPi) AbortHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	log.Printf(color.RedString("Closing THE LOAD BALANCER"))
+	log.Println(color.RedString("Closing THE LOAD BALANCER"))
 
-	log.Printf(color.RedString("Closing THE ADMIN API"))
+	log.Println(color.RedString("Closing THE ADMIN API"))
 
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
