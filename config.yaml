@@ -1,10 +1,10 @@
 servers : 
 - name : server1
-  url : http://localhost:8082
+  url : https://www.google.com/
   alive : true
   max_request_per_server : 1000
 - name : server2
-  url : http://localhost:8081
+  url : https://www.youtube.com/
   alive : true
   max_request_per_server : 1000
 - name : server3
@@ -22,3 +22,4 @@ LoadBalancerConfig :
   algorithim : Round_robin 
   host : localhost
   port : 8080
+  health_check_interval : 5m

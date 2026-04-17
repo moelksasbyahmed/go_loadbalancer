@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -13,9 +14,10 @@ type Serversconfig struct {
 	MaxRequest int    `mapstructure:"max_request_per_server"`
 }
 type LoadBalancerconfig struct {
-	Port       string `mapstructure:"port"`
-	Host       string `mapstructure:"host"`
-	Algorithim string `mapstructure:"algorithim"`
+	Port                string        `mapstructure:"port"`
+	Host                string        `mapstructure:"host"`
+	Algorithim          string        `mapstructure:"algorithim"`
+	HealthCheckInterval time.Duration `mapstructure:"health_check_interval"`
 }
 
 type Config struct {
