@@ -64,3 +64,12 @@ func (lb *LoadBalancer) RemoveBackend(server *Backend) error {
 	}
 	return fmt.Errorf("The Server  %s you want to Delete doesnt Exist ", server.Name)
 }
+
+func (lb *LoadBalancer) HealthStatus() map[*Backend]bool {
+	state := make(map[*Backend]bool)
+	for _, server := range lb.ServerPool {
+		state[server.Backend] = server.Backend.Alive.Load()
+	}
+	return state
+
+}
