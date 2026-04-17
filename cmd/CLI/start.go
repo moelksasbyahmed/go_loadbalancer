@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -47,6 +48,9 @@ var StartCmd = &cobra.Command{
 			return errors.New("the admin port is not available you can kill the connection or try another port the retry the connection you entered  " + config.Adminconfig.Port)
 		}
 		Loadbalancer.Populate_LoadBalancer(config)
+		HealthCtx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		Loadbalancer.StartHealthCheckLoop(HealthCtx, config.LoadBalancerConfig.HealthCheckInterval)
 		LBserver = server.NewServer(config, Loadbalancer)
 		go func() {
 			defer wg.Done()
