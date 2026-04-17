@@ -10,6 +10,7 @@ type Backend struct {
 	Name  string
 	Url   *url.URL
 	Alive atomic.Bool
+	mux   sync.RWMutex
 }
 
 type LoadBalancerUnit struct {
