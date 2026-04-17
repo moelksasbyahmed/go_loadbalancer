@@ -1,25 +1,25 @@
-servers : 
-- name : server1
-  url : https://www.google.com/
-  alive : true
-  max_request_per_server : 1000
-- name : server2
-  url : https://www.youtube.com/
-  alive : true
-  max_request_per_server : 1000
-- name : server3
-  url: http://localhost:8083
-  alive : true 
-  max_request_per_server : 1000
-
-
-
-adminConfig : 
-  host : localhost
-  port : 8086
-
-LoadBalancerConfig :  
-  algorithim : Round_robin 
-  host : localhost
-  port : 8080
-  health_check_interval : 5m
+adminconfig:
+    host: localhost
+    port: 8086
+loadbalancerconfig:
+    algorithim: Round_robin
+    health_check_interval: 5m
+    host: localhost
+    port: 8080
+servers:
+    - name: server1
+      url: https://www.google.com/
+      alive: true
+      maxrequest: 1000
+    - name: server2
+      url: https://www.youtube.com/
+      alive: true
+      maxrequest: 1000
+    - name: server3
+      url: http://localhost:8083
+      alive: true
+      maxrequest: 1000
+    - name: facebook
+      url: www.facebook.com
+      alive: true
+      maxrequest: 500

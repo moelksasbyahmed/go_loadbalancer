@@ -22,6 +22,7 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 		}
 		if err != nil {
 			http.Error(w, "Service Unavailable", http.StatusServiceUnavailable)
+			return
 		}
 		Director := func(req *http.Request) {
 
@@ -36,7 +37,7 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 			req.Header.Set("X-Forwarded-For", clientIP)
 			req.Header.Set("X-Forwarded-Host", req.Host)
 			req.Header.Set("X-Forwarded-Proto", req.URL.Scheme)
-			log.Printf("proxying %s  to %s  (Client_ip %s)\n ", req.URL.Path, Backend.Url, clientIP)
+			//log.Printf("proxying %s  to %s  (Client_ip %s)\n ", req.URL.Path, Backend.Url, clientIP)
 
 		}
 		Transport := &http.Transport{
@@ -58,6 +59,14 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 				log.Printf("Proxy error: %v", err)
 				http.Error(rw, "Bad Gateway", http.StatusBadGateway)
 			},
+		}
+		for _, servers := range lb.ServerPool {
+			if servers.Backend.Name == Backend.Name && servers.Backend.Url.String() == Backend.Url.String() {
+				servers.Balance.current_traffic.Add(1)
+				servers.Balance.overalltraffic.Add(1)
+				defer servers.Balance.current_traffic.Add(-1)
+				break
+			}
 		}
 
 		proxy.ServeHTTP(w, r)

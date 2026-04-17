@@ -2,12 +2,14 @@ package server
 
 import (
 	"fmt"
+
 	"net/url"
 	"slices"
 
 	"sync/atomic"
 
 	internal "github.com/moelksasbyahmed/go_loadbalancer/internal"
+	"github.com/spf13/viper"
 )
 
 func (lb *LoadBalancer) Populate_LoadBalancer(conf *internal.Config) {
@@ -71,5 +73,21 @@ func (lb *LoadBalancer) HealthStatus() map[*Backend]bool {
 		state[server.Backend] = server.Backend.Alive.Load()
 	}
 	return state
+
+}
+
+func (lb *LoadBalancer) ViperSync() {
+	var currentServers []internal.Serversconfig
+
+	for _, servers := range lb.ServerPool {
+		currentServers = append(currentServers, internal.Serversconfig{
+			Name:       servers.Backend.Name,
+			URl:        servers.Backend.Url.String(),
+			Alive:      servers.Backend.IsAlive(),
+			MaxRequest: servers.Balance.Max_request,
+		})
+
+	}
+	viper.Set("servers", currentServers)
 
 }
