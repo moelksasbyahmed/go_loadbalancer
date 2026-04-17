@@ -3,13 +3,10 @@ package adminapi
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 
-	"github.com/moelksasbyahmed/go_loadbalancer/internal"
 	server "github.com/moelksasbyahmed/go_loadbalancer/internal/server"
-	"github.com/spf13/viper"
 )
 
 func (api *AdminAPi) AddHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,26 +29,7 @@ func (api *AdminAPi) AddHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Failed to add backend: %v", err), http.StatusBadRequest)
 		return
 	}
-	var currentServers []internal.Serversconfig
-	if err := viper.UnmarshalKey("servers", &currentServers); err != nil {
-		log.Printf("Failed to unmarshal servers config: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	currentServers = append(currentServers, internal.Serversconfig{
-		Name:       b.Name,
-		URl:        b.Url,
-		Alive:      true,
-		MaxRequest: b.MaxRequest,
-	})
-	viper.Set("servers", currentServers)
-
-	
-	if err := viper.WriteConfig(); err != nil {
-		log.Printf("Failed to write config file: %v", err)
-		http.Error(w, "Failed to save configuration", http.StatusInternalServerError)
-		return
-	}
+	api.LBServer.LB.ViperSync()
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("the backend added successfully "))
 }
