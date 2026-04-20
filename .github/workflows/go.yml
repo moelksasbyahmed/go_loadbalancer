@@ -24,9 +24,9 @@ jobs :
       - name : Build
         
         run : >
-          echo "Building on ${{ matrix.os }} with Go ${{ matrix.go-version }}" &&
+          echo "Building on ${{ matrix.os }} with Go ${{ matrix.go-version }}" 
           go build -v ./...
       - name : Test
         run : >
-          echo "Testing on ${{ matrix.os }} with Go ${{ matrix.go-version }}" &&
+          echo "Testing on ${{ matrix.os }} with Go ${{ matrix.go-version }}" 
           go test -v ./...
