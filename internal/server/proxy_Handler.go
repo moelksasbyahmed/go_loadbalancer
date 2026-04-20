@@ -21,9 +21,9 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 		}).DialContext,
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		Backend, err := lb.config.Algorithim.NextPeer(lb.ServerPool)
+		Backend, err := lb.Config.Algorithim.NextPeer(lb.ServerPool)
 		for _, servers := range lb.ServerPool {
-			log.Printf("Backend %s is alive: %t, current traffic: %d, max request: %d\n", servers.Backend.Url, servers.Backend.Alive.Load(), servers.Balance.current_traffic.Load(), servers.Balance.Max_request)
+			log.Printf("Backend %s is alive: %t, current traffic: %d, max request: %d\n", servers.Backend.Url, servers.Backend.Alive.Load(), servers.Balance.Current_traffic.Load(), servers.Balance.Max_request)
 		}
 		if Backend == nil {
 			log.Printf("Backend is nil - no available servers")
@@ -61,9 +61,9 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 		}
 		for _, servers := range lb.ServerPool {
 			if servers.Backend.Name == Backend.Name && servers.Backend.Url.String() == Backend.Url.String() {
-				servers.Balance.current_traffic.Add(1)
-				servers.Balance.overalltraffic.Add(1)
-				defer servers.Balance.current_traffic.Add(-1)
+				servers.Balance.Current_traffic.Add(1)
+				servers.Balance.Overalltraffic.Add(1)
+				defer servers.Balance.Current_traffic.Add(-1)
 				break
 			}
 		}

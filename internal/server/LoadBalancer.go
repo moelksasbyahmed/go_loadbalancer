@@ -23,7 +23,7 @@ type LoadBalancer struct {
 	ServerPool    []*LoadBalancerUnit
 	Algorithim    BalancerAlgorithm
 	mux           sync.RWMutex
-	config        *LoadBalancerConfig
+	Config        *LoadBalancerConfig
 	WritingConfig *viper.Viper
 }
 
@@ -32,8 +32,8 @@ type LoadBalancerConfig struct {
 }
 
 type Serverbalance struct {
-	overalltraffic  atomic.Int64
-	current_traffic atomic.Int64
+	Overalltraffic  atomic.Int64
+	Current_traffic atomic.Int64
 	Max_request     int
 }
 
@@ -41,7 +41,7 @@ func NewloadBalancer(config *LoadBalancerConfig, writer *viper.Viper) *LoadBalan
 	return &LoadBalancer{
 		ServerPool:    make([]*LoadBalancerUnit, 0),
 		Algorithim:    config.Algorithim,
-		config:        config,
+		Config:        config,
 		WritingConfig: writer,
 	}
 }

@@ -43,7 +43,7 @@ func (s *Server) SetupRouter() *http.ServeMux {
 	mux.HandleFunc("/", s.LB.ProxyHandler()) //TODO needs to be fixed which make a proxy Handler is extendable from the server struct and not from the load balancer struct
 	mux.HandleFunc("/health", s.HealthHandler)
 	mux.HandleFunc("/stats", s.StatsHandler)
-	mux.HandleFunc("/metrics", s.MetricsHandler)
+	mux.HandleFunc("/metrics", s.MetricsHandler) // OLD DESIGN BUT we will keep it for now until we decide if we will try to implement  these handlers or leave the Excution Flow in the Admin api as it is for now Data 4/19/2026
 	return mux
 
 }

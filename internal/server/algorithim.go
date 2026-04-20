@@ -53,7 +53,7 @@ func (rr *RoundRobin) NextPeer(backends []*LoadBalancerUnit) (*Backend, error) {
 		if !candidate.Backend.Alive.Load() {
 			continue
 		}
-		if candidate.Balance.current_traffic.Load() >= int64(candidate.Balance.Max_request) {
+		if candidate.Balance.Current_traffic.Load() >= int64(candidate.Balance.Max_request) {
 			continue
 		}
 		return candidate.Backend, nil

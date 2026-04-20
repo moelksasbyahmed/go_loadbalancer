@@ -26,8 +26,8 @@ func (lb *LoadBalancer) Populate_LoadBalancer(conf *internal.Config) {
 				Alive: atomic.Bool{},
 			},
 			Balance: Serverbalance{
-				overalltraffic:  atomic.Int64{},
-				current_traffic: atomic.Int64{},
+				Overalltraffic:  atomic.Int64{},
+				Current_traffic: atomic.Int64{},
 				Max_request:     server.MaxRequest,
 			},
 		})
@@ -45,7 +45,7 @@ func (lb *LoadBalancer) AddBackend(server *LoadBalancerUnit) error {
 		if s.Backend.Name == server.Backend.Name {
 			return fmt.Errorf("backend with name %s already exists", server.Backend.Name)
 		}
-		server.Backend.Alive.Store(true)
+		server.Backend.Alive.Store(server.Backend.Alive.Load()) // Ensure the new backend's alive status is set to the default
 
 	}
 	lb.ServerPool = append(lb.ServerPool, server)
@@ -78,8 +78,8 @@ func (lb *LoadBalancer) TrafficStatus() map[*Backend]map[string]int64 {
 	states := make(map[*Backend]map[string]int64)
 	for _, server := range lb.ServerPool {
 		states[server.Backend] = map[string]int64{
-			"current_traffic": server.Balance.current_traffic.Load(),
-			"overall_traffic": server.Balance.overalltraffic.Load(),
+			"current_traffic": server.Balance.Current_traffic.Load(),
+			"overall_traffic": server.Balance.Overalltraffic.Load(),
 		}
 	}
 	return states
