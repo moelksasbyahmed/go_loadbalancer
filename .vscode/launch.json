@@ -12,7 +12,7 @@
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/CLI",
             "env": {},
-            "args": ["start", "-c","${workspaceFolder}/config.yaml", "-p", "8080"]
+            "args": ["start", "-c","${workspaceFolder}/config.yaml", "-p", "5000"]
         },
         {
             "name" : "Testing Abort Server",
@@ -22,8 +22,16 @@
             "program" : "${workspaceFolder}/cmd/CLI",
             "env" : {},
             "args" : ["abort"]
+        },
+        {
+            "name" : "Testing Add Server",
+            "type": "go",
+            "request" : "launch",
+            "mode" : "auto",
+            "program" : "${workspaceFolder}/cmd/CLI",
+            "env" : {},
+            "args" : ["add", "-n", "backend1", "-u", "http://localhost:5001", "-m", "10"]
         }
-        
 
     ]
 }
