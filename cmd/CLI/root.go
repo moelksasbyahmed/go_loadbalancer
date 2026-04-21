@@ -37,25 +37,6 @@ var rootCmd = &cobra.Command{
 	SilenceUsage: true,
 }
 
-/*
-* we will have 8  commands : start , abort , add , delete , check , list , status  , sync   each command will have its  own functionality and flags
-we will store the Backends in postgres database so we will need a migration tool
-
-|-
-cmd -- : root.go , main.go , start.go , abort.go , add.go , delete.go , check.go , list.go , status.go , report.go , sync.go
-the functionality of each command will defined in the internal package and we will use the cobra library to handle the command line interface
-the functionality of each commmand will be as follows
-
-	start : will start the load balancer and listen for incoming traffic on a specified port or read from config.yaml file
-	abort : will stop the load balancer and close all connections and sync the state of the load balancer with the database  and store the current state of the load balancer in the database
-	add : will add a new backend server to the load balancer and store the backend server in the database
-	delete : will delete a backend server from the load balancer and remove the backend server from the database
-	check : will check the health of the backend servers and update the status of the backend servers in the database
-	list : will list all the backend servers and their status
-	status : will show the current status of the load balancer and the backend servers
-
-	sync : will sync the state of the load balancer with the database and update the status of the backend servers in the database
-*/
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 

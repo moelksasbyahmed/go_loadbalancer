@@ -1,0 +1,53 @@
+
+services:
+  loadbalancer:
+    build: 
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "8086:8086"
+      - "5000:5000"
+    networks:
+      - LoadBalancerNetwork
+    depends_on: 
+       - backend1
+       - backend2
+       - backend3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  backend1:
+    image: hashicorp/http-echo
+    command: ["-text=Hello from Backend 1", "-listen=:8081"]
+    ports:
+      - "8081:8081"
+    networks:
+      - LoadBalancerNetwork
+  backend2:
+    image: hashicorp/http-echo
+    command: ["-text=Hello from Backend 2", "-listen=:8082"]
+    ports:
+      - "8082:8082"
+    networks:
+      - LoadBalancerNetwork
+  backend3:
+    image: hashicorp/http-echo
+    command: ["-text=Hello from Backend 3", "-listen=:8083"]
+    ports:
+      - "8083:8083"
+    networks:
+      - LoadBalancerNetwork
+
+
+  adminfrontend:
+    build:
+      context: ./cmd/AdminApi/adminDashBoard
+      dockerfile: dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loadbalancer
+    networks:
+      - LoadBalancerNetwork
+networks:
+  LoadBalancerNetwork:
+    driver: bridge
