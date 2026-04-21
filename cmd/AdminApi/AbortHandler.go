@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	_ "github.com/moelksasbyahmed/go_loadbalancer/internal/server"
+	
 )
 
 func (api *AdminAPi) AbortHandler(w http.ResponseWriter, r *http.Request) {

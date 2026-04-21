@@ -28,6 +28,7 @@ var AddCommand = &cobra.Command{
 			Url:         backend_url,
 			Max_request: Max_request,
 		}
+		fmt.Println("this is the backend end name and url" + name + " " + backend_url)
 		bodybuffer := new(bytes.Buffer)
 		if err := json.NewEncoder(bodybuffer).Encode(data); err != nil {
 			return err

@@ -11,7 +11,7 @@ type Serversconfig struct {
 	Name       string `mapstructure:"name"`
 	URl        string `mapstructure:"url"`
 	Alive      bool   `mapstructure:"alive"`
-	MaxRequest int    `mapstructure:"max_request_per_server"`
+	MaxRequest int    `mapstructure:"maxrequest"`
 }
 type LoadBalancerconfig struct {
 	Port                string        `mapstructure:"port"`

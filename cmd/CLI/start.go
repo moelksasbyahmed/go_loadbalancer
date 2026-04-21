@@ -59,6 +59,7 @@ var StartCmd = &cobra.Command{
 
 		ctx, sigCancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 		defer sigCancel()
+		Loadbalancer.RunManualCheck("all")
 		Loadbalancer.StartHealthCheckLoop(HealthCtx, ctx, config.LoadBalancerConfig.HealthCheckInterval)
 		LBserver = server.NewServer(config, Loadbalancer)
 		go func() {

@@ -27,7 +27,19 @@ func NewAdminAPI(Lbserver *LB.Server, config *internal.Config) *AdminAPi {
 
 func (api *AdminAPi) Start() error {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", api.LoggerHandler)
+
+	corsWrapper := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		mux.ServeHTTP(w, r)
+	})
+
+	mux.HandleFunc("/logger", api.LoggerHandler)
 	mux.HandleFunc("/check", api.CheckHandler)
 	mux.HandleFunc("/add", api.AddHandler)
 	mux.HandleFunc("/remove", api.handleRemoveServer)
@@ -36,7 +48,7 @@ func (api *AdminAPi) Start() error {
 	mux.HandleFunc("/abort", api.AbortHandler)
 	api.server = &http.Server{
 		Addr:         net.JoinHostPort(api.config.Adminconfig.Host, api.config.Adminconfig.Port),
-		Handler:      mux,
+		Handler:      corsWrapper,
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  5 * time.Second,
 		IdleTimeout:  120 * time.Second,

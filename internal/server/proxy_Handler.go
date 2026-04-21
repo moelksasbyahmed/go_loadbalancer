@@ -23,7 +23,7 @@ func (lb *LoadBalancer) ProxyHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		Backend, err := lb.Config.Algorithim.NextPeer(lb.ServerPool)
 		for _, servers := range lb.ServerPool {
-			log.Printf("Backend %s is alive: %t, current traffic: %d, max request: %d\n", servers.Backend.Url, servers.Backend.Alive.Load(), servers.Balance.Current_traffic.Load(), servers.Balance.Max_request)
+			log.Printf("Backend %s is alive: %t, current traffic: %d,overall_traffic : %d, max request: %d\n", servers.Backend.Url, servers.Backend.Alive.Load(), servers.Balance.Current_traffic.Load(), servers.Balance.Overalltraffic.Load(), servers.Balance.Max_request)
 		}
 		if Backend == nil {
 			log.Printf("Backend is nil - no available servers")
